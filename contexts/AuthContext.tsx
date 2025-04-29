@@ -4,6 +4,8 @@ import { Alert } from 'react-native';
 import { saveToken, getToken as getStoredToken, removeToken } from '../utils/tokenStorage';
 
 type AuthContextType = {
+  user: any;
+  setUser: (user: any) => void;
   isAuthenticated: boolean;
   authenticate: () => Promise<void>;
   logout: () => void;
@@ -22,6 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isBiometricSupported, setIsBiometricSupported] = useState(false);
   const [token, setTokenState] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
 
   // Check biometric support and load token on component mount
   useEffect(() => {
@@ -79,7 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         fallbackLabel: 'Use passcode',
         disableDeviceFallback: false,
       });
-
+      //console.log('result>>>>>>>>>>', result);
       return result.success;
     } catch (error) {
       Alert.alert('Error', 'Failed to authenticate. Please try again.');
@@ -94,6 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     const authenticated = await authenticateWithBiometrics();
+    console.log('authenticated>>>>>>>>>>\n\n', authenticated);
     if (authenticated) {
       setIsAuthenticated(true);
     } else {
@@ -123,6 +127,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return (
     <AuthContext.Provider 
       value={{ 
+        user,
+        setUser,
         isAuthenticated,
         authenticate,
         logout,

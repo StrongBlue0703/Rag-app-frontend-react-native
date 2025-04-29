@@ -22,6 +22,11 @@ interface Message {
   loading?: boolean;
 }
 
+interface ChatComponentProps {
+  onRemoveNote?: (index: number) => void;
+  selectedNoteIndex?: number;
+}
+
 const MessageItem = memo(({ item }: { item: Message }) => (
   <View
     style={[
@@ -48,7 +53,7 @@ const MessageItem = memo(({ item }: { item: Message }) => (
   </View>
 ));
 
-const ChatComponent: React.FC = () => {
+const ChatComponent: React.FC<ChatComponentProps> = ({ onRemoveNote, selectedNoteIndex }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [conversationHistory, setConversationHistory] = useState<MessageType[]>([]);
   const [inputMessage, setInputMessage] = useState('');
@@ -100,9 +105,11 @@ const ChatComponent: React.FC = () => {
     setInputMessage('');
   }, [inputMessage, connectionStatus, sendChatMessage, sendAuthMessage, conversationHistory, wsChat, wsAuth]);
 
-  const handleUpload = useCallback(() => {
-    router.push('/repositoryManagement');
-  }, []);
+  const handleRemoveNote = useCallback(() => {
+    if (onRemoveNote && selectedNoteIndex !== undefined) {
+      onRemoveNote(selectedNoteIndex);
+    }
+  }, [onRemoveNote, selectedNoteIndex]);
 
   useEffect(() => {
     if (flatListRef.current && messages.length > 0) {
@@ -133,9 +140,11 @@ const ChatComponent: React.FC = () => {
       {isTyping && connectionStatus === 'connected' && <TypingIndicator isVisible={true} />}
 
       <View style={styles.inputContainer}>
-        <TouchableOpacity style={styles.uploadButton} onPress={handleUpload}>
-          <Ionicons name="cloud-upload-sharp" size={24} color="black" />
-        </TouchableOpacity>
+        {selectedNoteIndex !== undefined && (
+          <TouchableOpacity style={styles.uploadButton} onPress={handleRemoveNote}>
+            <Ionicons name="trash-outline" size={24} color="black" />
+          </TouchableOpacity>
+        )}
         <TextInput
           style={[
             styles.input,
@@ -171,12 +180,15 @@ export default memo(ChatComponent);
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     backgroundColor: '#060606',
   },
   listContainer: {
     flexGrow: 1,
-    paddingVertical: 10,
+    // paddingVertical: 10,
   },
   messageBubble: {
     padding: 10,

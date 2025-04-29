@@ -20,6 +20,7 @@ import axios from 'axios';
 import RepositoryAPI from '../api/repositoryApi';
 import { Repository, RepositoryError } from '../interfaces/repository';
 import { useAuth } from '../contexts/AuthContext';
+import { usePage } from '@/contexts/PageContext';
 import { BACKEND_URL } from '@/config/api';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import FileManagement from '@/components/FileManagement';
@@ -29,6 +30,7 @@ const { width } = Dimensions.get('window');
 
 function RepositoryManagementScreen() {
   const { getToken, isAuthenticated, authenticate } = useAuth();
+  const { setCurrentPage } = usePage();
   const [repositories, setRepositories] = useState<Repository[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedRepository, setSelectedRepository] = useState<Repository | null>(null);
@@ -157,6 +159,7 @@ function RepositoryManagementScreen() {
   }, [newRepoName, getToken]);
 
   const cancelCreateRepository = useCallback(() => {
+    setCurrentPage('repository Management');
     setRepoModalVisible(false);
     setNewRepoName('');
   }, []);

@@ -2,9 +2,11 @@
 
 # dependencies
 node_modules/
+android/
 
 # Expo
 .expo/
+.vscode/
 dist/
 web-build/
 expo-env.d.ts

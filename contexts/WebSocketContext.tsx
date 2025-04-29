@@ -56,7 +56,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [lastMessage, setLastMessage] = useState<string | null>(null);
 
-  const { getToken, setToken, clearToken, isAuthenticated } = useAuth();
+  const { getToken, setToken, clearToken, isAuthenticated, setUser } = useAuth();
 
   const toggleAnimation = useCallback(() => {
     setIsAnimationEnabled((prev) => !prev);
@@ -118,13 +118,17 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     };
 
     wsChatRef.current = chatWs;
-    console.log('Chat WebSocket initialized >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+    //console.log('Chat WebSocket initialized >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
   }, [setToken, handleTokenExpiration]);
 
   const handleWebSocketMessage = useCallback(async (event: MessageEvent) => {
     try {
       const data = JSON.parse(event.data);
       if (data.token) {
+        if(data.user){
+          console.log("USER===INFO", data.user);
+          setUser(data.user);
+        }
         await setToken(data.token);
         if (wsChatRef.current && wsChatRef.current.readyState === WebSocket.OPEN) {
           wsChatRef.current.send(JSON.stringify({ update_token: data.token }));
